@@ -5,8 +5,10 @@ export const metadata: Metadata = { title: "Skins personalizadas · Chapter & Bl
 
 export default function CustomPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <CustomForm />
+    <div className="paper overflow-x-clip">
+      <div className="mx-auto max-w-7xl px-4 pb-24 pt-10 sm:px-6">
+        <CustomForm />
+      </div>
     </div>
   );
 }

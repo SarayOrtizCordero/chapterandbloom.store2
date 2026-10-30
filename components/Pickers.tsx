@@ -46,7 +46,7 @@ const Chevron = ({ open }: { open: boolean }) => (
 );
 
 const Check = () => (
-  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mint" aria-hidden>
+  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-aqua" aria-hidden>
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#312a44" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M5 12.5l4.5 4.5L19 7.5" />
     </svg>
@@ -119,7 +119,7 @@ export function ModelPicker({ model, onModel, error }: { model: string; onModel:
 
   return (
     <div ref={root}>
-      <span id={`${listId}-label`} className="mb-2 block font-bold">
+      <span id={`${listId}-label`} className="mb-2 block font-extrabold">
         Dispositivo <span className="font-normal text-ink-soft">(obligatorio)</span>
       </span>
       <div className="relative">
@@ -138,11 +138,11 @@ export function ModelPicker({ model, onModel, error }: { model: string; onModel:
               openList();
             }
           }}
-          className={`flex w-full items-center gap-3 rounded-2xl border-2 bg-white p-3 text-left transition ${
-            open ? "border-ink ring-4 ring-mint/70" : error ? "border-rose-deep ring-4 ring-rose/60" : "border-ink/60 hover:border-ink"
+          className={`flex w-full items-center gap-3 rounded-2xl border-2 bg-paper p-3 text-left shadow-[3px_3px_0_var(--color-mauve)] transition ${
+            open ? "border-ink ring-4 ring-aqua" : error ? "border-berry ring-4 ring-mauve" : "border-ink hover:-translate-y-0.5"
           }`}
         >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-mint" aria-hidden>
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-aqua" aria-hidden>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#312a44" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <rect x="5" y="2.5" width="14" height="19" rx="2.5" />
               <path d="M8.5 7.5h7M8.5 11h7M8.5 14.5h4" />
@@ -165,8 +165,8 @@ export function ModelPicker({ model, onModel, error }: { model: string; onModel:
         </button>
 
         {open && (
-          <div className="absolute inset-x-0 z-30 mt-2 overflow-hidden rounded-2xl border border-ink/10 bg-white shadow-pop">
-            <div className="border-b border-ink/10 p-3">
+          <div className="absolute inset-x-0 z-30 mt-2 overflow-hidden rounded-2xl border-2 border-ink bg-paper shadow-[6px_6px_0_var(--color-mauve)]">
+            <div className="border-b-2 border-ink/15 p-3">
               <div className="relative">
                 <svg className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-soft" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
                   <circle cx="11" cy="11" r="7" />
@@ -186,14 +186,14 @@ export function ModelPicker({ model, onModel, error }: { model: string; onModel:
                   aria-activedescendant={flat[active] ? optId(active) : undefined}
                   aria-label="Buscar modelo"
                   placeholder="Busca tu modelo…"
-                  className="w-full rounded-xl bg-lavender-soft py-2.5 pl-10 pr-3 text-sm placeholder:text-ink-soft"
+                  className="w-full rounded-xl bg-mauve-soft py-2.5 pl-10 pr-3 text-sm placeholder:text-ink-soft"
                 />
               </div>
             </div>
             <ul id={listId} role="listbox" aria-label="Dispositivos" className="max-h-72 overflow-y-auto pb-2">
               {groups.map((g) => (
                 <li key={g.id} role="presentation">
-                  <p className="sticky top-0 z-10 bg-mint-soft px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-ink-soft">{g.name}</p>
+                  <p className="sticky top-0 z-10 bg-aqua-soft px-4 py-1.5 text-sm font-extrabold text-ink">{g.name}</p>
                   <ul role="presentation">
                     {g.models.map((m) => {
                       const i = flat.indexOf(m);
@@ -206,7 +206,7 @@ export function ModelPicker({ model, onModel, error }: { model: string; onModel:
                           aria-selected={selected}
                           onMouseEnter={() => setActive(i)}
                           onClick={() => choose(m)}
-                          className={`flex cursor-pointer items-center justify-between gap-3 px-4 py-2.5 text-sm ${i === active ? "bg-lavender-soft" : ""} ${selected ? "font-bold" : ""}`}
+                          className={`flex cursor-pointer items-center justify-between gap-3 px-4 py-2.5 text-sm ${i === active ? "bg-aqua-soft" : ""} ${selected ? "font-bold" : ""}`}
                         >
                           {m}
                           {selected && <Check />}
@@ -216,20 +216,20 @@ export function ModelPicker({ model, onModel, error }: { model: string; onModel:
                   </ul>
                 </li>
               ))}
-              {groups.length === 0 && <li className="px-4 py-6 text-center text-sm text-ink-soft">No encontramos ese modelo. Escríbenos por Instagram y lo miramos 🤍</li>}
+              {groups.length === 0 && <li className="px-4 py-6 text-center text-sm text-ink-soft">No encontramos ese modelo. Escríbenos por Instagram y lo miramos.</li>}
             </ul>
           </div>
         )}
       </div>
 
       {error && (
-        <p role="alert" className="mt-2 text-sm font-bold text-rose-deep">
+        <p role="alert" className="mt-2 text-sm font-bold text-berry">
           Elige tu modelo para continuar.
         </p>
       )}
       <details className="mt-3 text-sm">
-        <summary className="cursor-pointer font-semibold underline decoration-mint decoration-2 underline-offset-4">¿No estás segura? Encuentra tu modelo</summary>
-        <div className="mt-2 space-y-1 rounded-xl bg-mint-soft p-4 text-ink-soft">
+        <summary className="cursor-pointer font-extrabold underline decoration-aqua decoration-4 underline-offset-4">¿No estás segura? Encuentra tu modelo</summary>
+        <div className="mt-2 space-y-1 rounded-xl border-2 border-ink bg-aqua-soft p-4 text-ink-soft">
           <p>
             <strong className="text-ink">Kindle:</strong> Ajustes → Opciones del dispositivo → Información del dispositivo.
           </p>
@@ -299,9 +299,9 @@ export function FinishPicker({ value, onChange, image }: { value: FinishId; onCh
   const current = finishById(value);
   return (
     <fieldset>
-      <legend className="mb-2.5 font-bold">
+      <legend className="mb-3 font-extrabold">
         Acabado: <span className="font-normal">{current.name}</span>
-        {current.holo && <span className="ml-2 rounded-full bg-mint px-2.5 py-0.5 align-middle text-xs font-bold">+{eur(HOLO_EXTRA)}</span>}
+        {current.holo && <span className="ml-2 rounded-full border-2 border-ink bg-aqua px-2.5 py-0.5 align-middle text-xs font-extrabold">+{eur(HOLO_EXTRA)}</span>}
       </legend>
       <div role="radiogroup" aria-label="Acabado" className="grid grid-cols-6 gap-1.5">
         {finishes.map((f) => {
@@ -314,13 +314,13 @@ export function FinishPicker({ value, onChange, image }: { value: FinishId; onCh
               aria-checked={active}
               aria-label={f.holo ? `${f.name}, más ${HOLO_EXTRA} euro` : f.name}
               onClick={() => onChange(f.id)}
-              className={`flex min-w-0 flex-col gap-1 rounded-[10px] text-center text-[11px] font-semibold leading-tight transition duration-150 active:scale-95 ${
-                active ? "border-2 border-ink bg-mint-soft p-[3.5px] pb-1" : "border-[1.5px] border-ink/25 bg-white p-1 pb-1.5 hover:border-ink/60"
+              className={`flex min-w-0 flex-col gap-1 rounded-[10px] text-center text-[11px] font-bold leading-tight transition duration-200 active:scale-95 ${
+                active ? "-translate-y-1 rotate-[-2deg] border-2 border-ink bg-aqua p-[3.5px] pb-1 shadow-[3px_3px_0_var(--color-ink)]" : "border-2 border-ink/40 bg-paper p-1 pb-1.5 hover:-translate-y-0.5 hover:border-ink"
               }`}
             >
               <Swatch id={f.id} image={image} />
               <span>{f.name}</span>
-              {f.holo && <span className="mx-auto mt-auto rounded-full bg-mint px-1.5 text-[10px] font-bold">+{HOLO_EXTRA} €</span>}
+              {f.holo && <span className="mx-auto mt-auto rounded-full border border-ink bg-aqua px-1.5 text-[10px] font-extrabold">+{HOLO_EXTRA} €</span>}
             </button>
           );
         })}

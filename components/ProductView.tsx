@@ -80,26 +80,30 @@ export function ProductView({ product }: { product: Product }) {
         <Gallery key={variantId} images={images} alt={product.name} finish={product.hasFinish ? finish : undefined} portrait={portrait} />
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-7">
         <div>
-          <Link href={`/tienda?cat=${product.category}`} className="text-sm font-semibold underline decoration-mint decoration-2 underline-offset-4">
+          <Link href={`/tienda?cat=${product.category}`} className="marker inline-block px-1 text-sm font-extrabold">
             ← {category?.name}
           </Link>
-          <p className="mt-4 text-xs font-bold uppercase tracking-widest text-ink-soft">{kindLabel[product.kind]}</p>
-          <h1 className="font-display mt-1 text-3xl font-black leading-tight sm:text-4xl">{product.name}</h1>
-          <p className="mt-3 text-2xl font-bold">
-            {eur(price)}
-            {product.hasFinish && finishById(finish).holo && <span className="ml-2 rounded-full bg-mint px-2.5 py-0.5 align-middle text-xs font-bold">incl. acabado holográfico</span>}
+          <p className="mt-5">
+            <span className="inline-block rounded-lg border-2 border-ink bg-aqua px-2.5 py-0.5 text-xs font-extrabold">{kindLabel[product.kind]}</span>
           </p>
-          <p className="mt-3 max-w-prose text-ink-soft">{product.description}</p>
+          <h1 className="font-display mt-3 text-4xl leading-[1.05] [text-shadow:3px_3px_0_var(--color-mauve)] sm:text-5xl">{product.name}</h1>
+          <p className="mt-4 flex flex-wrap items-center gap-3">
+            <span className="font-display text-4xl">{eur(price)}</span>
+            {product.hasFinish && finishById(finish).holo && (
+              <span className="rounded-full border-2 border-ink bg-aqua px-3 py-0.5 text-xs font-extrabold">incluye acabado holográfico</span>
+            )}
+          </p>
+          <p className="mt-4 max-w-prose text-lg text-ink-soft">{product.description}</p>
         </div>
 
         {product.variants && (
           <fieldset>
-            <legend className="mb-2 font-bold">
-              {product.variants.label}: <span className="font-normal">{variant?.label}</span>
+            <legend className="mb-3 font-extrabold">
+              {product.variants.label}: <span className="font-medium">{variant?.label}</span>
             </legend>
-            <div role="radiogroup" aria-label={product.variants.label} className="flex flex-wrap gap-2.5">
+            <div role="radiogroup" aria-label={product.variants.label} className="flex flex-wrap gap-3">
               {product.variants.options.map((o) => {
                 const active = o.id === variantId;
                 return o.swatch ? (
@@ -111,19 +115,14 @@ export function ProductView({ product }: { product: Product }) {
                     aria-label={o.label}
                     title={o.label}
                     onClick={() => setVariantId(o.id)}
-                    className={`h-11 w-11 rounded-full border-2 p-0.5 transition ${active ? "border-ink" : "border-transparent hover:border-ink/40"}`}
+                    className={`h-11 w-11 rounded-full border-2 border-ink p-0.5 transition duration-300 [transition-timing-function:var(--ease-stick)] ${
+                      active ? "scale-110 shadow-[0_0_0_3px_var(--color-aqua),0_0_0_5px_var(--color-ink)]" : "hover:-translate-y-0.5 hover:scale-105"
+                    }`}
                   >
-                    <span className="block h-full w-full rounded-full border border-ink/15" style={{ background: o.swatch }} />
+                    <span className="block h-full w-full rounded-full border-2 border-ink/20" style={{ background: o.swatch }} />
                   </button>
                 ) : (
-                  <button
-                    key={o.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    onClick={() => setVariantId(o.id)}
-                    className={`rounded-full border-2 px-4 py-2 text-sm font-bold transition ${active ? "border-ink bg-ink text-cream" : "border-ink/60 bg-white hover:border-ink"}`}
-                  >
+                  <button key={o.id} type="button" role="radio" aria-checked={active} onClick={() => setVariantId(o.id)} className={`chip !px-4 !py-2 ${active ? "is-on" : ""}`}>
                     {o.label}
                   </button>
                 );
@@ -145,15 +144,15 @@ export function ProductView({ product }: { product: Product }) {
 
         {product.hasFinish && <FinishPicker value={finish} onChange={setFinish} image={fxImage} />}
 
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          <div className="flex items-center rounded-full border border-ink/60 bg-white">
-            <button type="button" className="h-12 w-12 text-xl" aria-label="Menos" onClick={() => setQty((q) => Math.max(1, q - 1))}>
+        <div className="flex flex-wrap items-center gap-4 pt-2">
+          <div className="flex items-center rounded-full border-2 border-ink bg-paper shadow-[3px_3px_0_var(--color-mauve)]">
+            <button type="button" className="h-12 w-12 rounded-full text-xl font-bold transition hover:bg-aqua" aria-label="Menos" onClick={() => setQty((q) => Math.max(1, q - 1))}>
               −
             </button>
-            <span className="w-8 text-center font-bold" aria-live="polite">
+            <span className="w-8 text-center font-extrabold" aria-live="polite">
               {qty}
             </span>
-            <button type="button" className="h-12 w-12 text-xl" aria-label="Más" onClick={() => setQty((q) => q + 1)}>
+            <button type="button" className="h-12 w-12 rounded-full text-xl font-bold transition hover:bg-aqua" aria-label="Más" onClick={() => setQty((q) => q + 1)}>
               +
             </button>
           </div>
@@ -163,19 +162,27 @@ export function ProductView({ product }: { product: Product }) {
         </div>
 
         {!buyVisible && (
-          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-ink/10 bg-cream/95 p-3 backdrop-blur lg:hidden">
+          <div className="fixed inset-x-0 bottom-0 z-30 border-t-2 border-ink bg-cream/95 p-3 backdrop-blur lg:hidden">
             <button type="button" onClick={submit} className="btn btn-primary w-full !py-3.5 text-base">
               Añadir al carrito · {eur(price * qty)}
             </button>
           </div>
         )}
 
-        <ul className="space-y-1.5 border-t border-ink/10 pt-5 text-sm text-ink-soft">
-          {bullets[product.kind].map((b) => (
-            <li key={b}>✦ {b}</li>
-          ))}
-        </ul>
-        {product.needsDevice && <p className="text-xs text-ink-soft">Solo decorativa: no es una funda de protección. Los colores pueden variar según la pantalla.</p>}
+        <div className="rounded-2xl border-2 border-ink bg-aqua-soft p-5">
+          <p className="font-hand text-2xl font-bold leading-none">Lo que tienes que saber</p>
+          <ul className="mt-3 space-y-2 text-[15px]">
+            {bullets[product.kind].map((b) => (
+              <li key={b} className="flex items-start gap-2.5">
+                <svg width="16" height="16" viewBox="0 0 100 100" className="mt-1 shrink-0" aria-hidden>
+                  <path d="M50 5C54 34 66 46 95 50 66 54 54 66 50 95 46 66 34 54 5 50 34 46 46 34 50 5Z" fill="var(--color-aqua)" stroke="var(--color-ink)" strokeWidth="9" strokeLinejoin="round" />
+                </svg>
+                {b}
+              </li>
+            ))}
+          </ul>
+          {product.needsDevice && <p className="mt-4 text-sm text-ink-soft">Solo decorativa: no es una funda de protección. Los colores pueden variar según la pantalla.</p>}
+        </div>
       </div>
     </div>
   );

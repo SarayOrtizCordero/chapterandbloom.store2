@@ -1,12 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useCart } from "@/lib/cart";
 import { eur, finishById, HOLO_EXTRA, PRICES, type FinishId } from "@/lib/data";
 import { Art } from "./Art";
 import { FinishPicker, ModelPicker } from "./Pickers";
+import { Flower, HandArrow, Heart, Sparkle } from "./Stickers";
 
 type Upload = { name: string; url: string };
+
+/** Cada bloque del formulario es un paso de verdad: se elige en este orden. */
+function Step({ n, children }: { n: number; children: ReactNode }) {
+  return (
+    <div className="flex gap-3.5">
+      <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-aqua text-sm font-extrabold">
+        {n}
+      </span>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
 
 export function CustomForm() {
   const { add } = useCart();
@@ -56,117 +69,149 @@ export function CustomForm() {
   };
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+    <div className="grid gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+      {/* Vista previa */}
       <div className="lg:sticky lg:top-28 lg:self-start">
-        <div className="relative flex aspect-square items-center justify-center rounded-3xl bg-white">
-          <Art designId="lavanda" variant={kind} finish={finish} image={files[0]?.url} className="h-[88%] drop-shadow-xl" />
+        <div className="relative mx-auto aspect-[1/1.05] w-full max-w-[460px]">
+          <div className="absolute inset-x-[7%] bottom-0 top-[2%] rounded-t-[999px] rounded-b-[28px] border-2 border-ink bg-mauve shadow-[6px_6px_0_var(--color-ink)]" />
+          <div className="absolute left-1/2 top-[11%] h-[78%] -translate-x-1/2">
+            <div key={`${kind}-${files[0]?.url ?? "base"}`} className="item-in h-full">
+              <div className="h-full rotate-[-3deg] [filter:drop-shadow(7px_8px_0_var(--color-ink))]">
+                <Art designId="lavanda" variant={kind} finish={finish} image={files[0]?.url} className="h-full w-auto" />
+              </div>
+            </div>
+          </div>
+          <Sparkle className="sticker-bob absolute -right-[2%] top-0 w-[22%]" />
+          <Heart className="sticker-bob absolute -left-[3%] top-[48%] w-[16%] -rotate-12" style={{ ["--bd" as string]: "-2s" }} />
+          <Flower className="sticker-bob absolute -right-[2%] bottom-[14%] w-[20%]" style={{ ["--bd" as string]: "-3.5s" }} />
         </div>
-        {!files[0] && <p className="mt-3 text-center text-sm font-semibold">Aquí verás una vista previa de tu diseño</p>}
-        <p className="mt-2 text-center text-xs text-ink-soft">Vista orientativa. Revisaremos tu imagen y te escribiremos si necesitamos ajustar algo.</p>
+        <div className="mt-5 text-center">
+          {!files[0] ? (
+            <p className="font-hand inline-flex items-start gap-1 text-2xl font-bold leading-none">
+              Aquí verás tu diseño
+              <HandArrow className="mt-1 h-7 w-9 rotate-[-70deg]" />
+            </p>
+          ) : (
+            <p className="font-hand text-2xl font-bold leading-none">Así va quedando</p>
+          )}
+          <p className="mx-auto mt-2 max-w-sm text-sm text-ink-soft">
+            Vista orientativa. Revisaremos tu imagen y te escribiremos si necesitamos ajustar algo.
+          </p>
+        </div>
       </div>
 
-      <div className="space-y-6">
+      {/* Formulario */}
+      <div className="tile space-y-8 p-5 sm:p-8">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-ink-soft">A tu gusto</p>
-          <h1 className="font-display mt-1 text-3xl font-black leading-tight sm:text-4xl">Crea tu skin personalizada</h1>
-          <p className="mt-3 max-w-prose text-ink-soft">
+          <h1 className="font-display text-4xl leading-[1.05] [text-shadow:3px_3px_0_var(--color-mauve)] sm:text-5xl">Crea tu skin personalizada</h1>
+          <p className="mt-4 max-w-prose text-ink-soft">
             Elige tu e-reader y el acabado, y sube tu diseño (hasta 2 imágenes). Cuéntanos en el mensaje cómo lo imaginas y nosotras lo preparamos.
           </p>
         </div>
 
-        <fieldset>
-          <legend className="mb-2 font-bold">Producto</legend>
-          <div className="grid grid-cols-2 gap-3" role="radiogroup">
-            {(
-              [
-                ["skin", "Skin personalizada", PRICES.customSkin],
-                ["insert", "Insert personalizado", PRICES.customInsert],
-              ] as const
-            ).map(([k, label, p]) => (
-              <button
-                key={k}
-                type="button"
-                role="radio"
-                aria-checked={kind === k}
-                onClick={() => setKind(k)}
-                className={`rounded-xl border-2 p-4 text-left transition ${kind === k ? "border-ink bg-white shadow-soft" : "border-ink/60 bg-white hover:border-ink"}`}
-              >
-                <span className="block text-sm font-semibold">{label}</span>
-                <span className="text-xl font-bold">{eur(p)}</span>
-              </button>
-            ))}
-          </div>
-        </fieldset>
+        <Step n={1}>
+          <fieldset>
+            <legend className="mb-3 font-extrabold">Qué quieres crear</legend>
+            <div className="grid grid-cols-2 gap-3" role="radiogroup">
+              {(
+                [
+                  ["skin", "Skin personalizada", PRICES.customSkin],
+                  ["insert", "Insert personalizado", PRICES.customInsert],
+                ] as const
+              ).map(([k, label, p]) => (
+                <button
+                  key={k}
+                  type="button"
+                  role="radio"
+                  aria-checked={kind === k}
+                  onClick={() => setKind(k)}
+                  className={`rounded-2xl border-2 border-ink p-4 text-left transition duration-300 [transition-timing-function:var(--ease-stick)] ${
+                    kind === k ? "-translate-y-1 rotate-[-1deg] bg-aqua shadow-[4px_4px_0_var(--color-ink)]" : "bg-paper shadow-[3px_3px_0_var(--color-mauve)] hover:-translate-y-0.5"
+                  }`}
+                >
+                  <span className="block text-sm font-bold">{label}</span>
+                  <span className="font-display text-2xl">{eur(p)}</span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        </Step>
 
-        <ModelPicker
-          model={model}
-          error={modelError}
-          onModel={(m) => {
-            setModel(m);
-            setModelError(false);
-          }}
-        />
-
-        <FinishPicker value={finish} onChange={setFinish} image={files[0] ? { src: files[0].url, kind: "plain" } : null} />
-
-        <fieldset>
-          <legend className="mb-2 font-bold">Tu diseño (máx. 2 imágenes)</legend>
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDrag(true);
+        <Step n={2}>
+          <ModelPicker
+            model={model}
+            error={modelError}
+            onModel={(m) => {
+              setModel(m);
+              setModelError(false);
             }}
-            onDragLeave={() => setDrag(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setDrag(false);
-              addFiles(e.dataTransfer.files);
-            }}
-            className={`rounded-2xl border-2 border-dashed p-6 text-center transition ${
-              fileError ? "border-rose-deep bg-rose/30" : drag ? "border-ink bg-mint-soft" : "border-ink/60 bg-white"
-            }`}
-          >
-            <input type="file" accept="image/*" multiple className="sr-only" id="files" onChange={(e) => addFiles(e.target.files)} />
-            {files.length < 2 ? (
-              <>
-                <p className="font-semibold">Arrastra aquí tu imagen o</p>
-                <label htmlFor="files" className="btn btn-ghost mt-3 !py-2.5">
-                  Elegir archivo
-                </label>
-                <p className="mt-2 text-xs text-ink-soft">{files.length}/2 subidas · JPG o PNG</p>
-              </>
-            ) : (
-              <p className="font-semibold">Has subido las 2 imágenes ✓</p>
-            )}
-            {files.length > 0 && (
-              <ul className="mt-4 grid grid-cols-2 gap-3">
-                {files.map((f, i) => (
-                  <li key={f.url} className="relative overflow-hidden rounded-xl bg-cream p-2 text-left">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={f.url} alt={`Imagen ${i + 1}`} className="aspect-square w-full rounded-lg object-cover" />
-                    <p className="mt-1 truncate text-xs">{f.name}</p>
-                    <button
-                      type="button"
-                      onClick={() => setFiles((fs) => fs.filter((_, k) => k !== i))}
-                      className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-ink text-cream"
-                      aria-label={`Quitar ${f.name}`}
-                    >
-                      ×
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          {fileError && (
-            <p role="alert" className="mt-2 text-sm font-bold text-rose-deep">
-              Sube al menos una imagen con tu diseño.
-            </p>
-          )}
-        </fieldset>
+          />
+        </Step>
 
-        <div>
-          <label htmlFor="note" className="mb-2 block font-bold">
+        <Step n={3}>
+          <FinishPicker value={finish} onChange={setFinish} image={files[0] ? { src: files[0].url, kind: "plain" } : null} />
+        </Step>
+
+        <Step n={4}>
+          <fieldset>
+            <legend className="mb-3 font-extrabold">Tu diseño (máx. 2 imágenes)</legend>
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDrag(true);
+              }}
+              onDragLeave={() => setDrag(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDrag(false);
+                addFiles(e.dataTransfer.files);
+              }}
+              className={`rounded-2xl border-2 border-dashed p-6 text-center transition ${
+                fileError ? "border-berry bg-mauve/40" : drag ? "border-ink bg-aqua" : "border-ink bg-paper"
+              }`}
+            >
+              <input type="file" accept="image/*" multiple className="sr-only" id="files" onChange={(e) => addFiles(e.target.files)} />
+              {files.length < 2 ? (
+                <>
+                  <p className="font-bold">Arrastra aquí tu imagen o</p>
+                  <label htmlFor="files" className="btn btn-aqua mt-3 !py-2.5">
+                    Elegir archivo
+                  </label>
+                  <p className="mt-3 text-xs text-ink-soft">{files.length}/2 subidas · JPG o PNG</p>
+                </>
+              ) : (
+                <p className="font-bold">Has subido las 2 imágenes</p>
+              )}
+              {files.length > 0 && (
+                <ul className="mt-4 grid grid-cols-2 gap-3">
+                  {files.map((f, i) => (
+                    <li key={f.url} className="item-in relative rounded-xl border-2 border-ink bg-cream p-2 text-left">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={f.url} alt={`Imagen ${i + 1}`} className="aspect-square w-full rounded-lg object-cover" />
+                      <p className="mt-1 truncate text-xs">{f.name}</p>
+                      <button
+                        type="button"
+                        onClick={() => setFiles((fs) => fs.filter((_, k) => k !== i))}
+                        className="absolute right-3.5 top-3.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-cream bg-ink text-cream"
+                        aria-label={`Quitar ${f.name}`}
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {fileError && (
+              <p role="alert" className="mt-2 text-sm font-bold text-berry">
+                Sube al menos una imagen con tu diseño.
+              </p>
+            )}
+          </fieldset>
+        </Step>
+
+        <Step n={5}>
+          <label htmlFor="note" className="mb-3 block font-extrabold">
             Mensaje para nosotras
           </label>
           <textarea
@@ -175,17 +220,21 @@ export function CustomForm() {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Cuéntanos cómo lo quieres: colocación de las imágenes, textos, colores, dudas…"
-            className="w-full rounded-xl border border-ink/60 bg-white px-4 py-3"
+            className="field w-full !rounded-2xl"
           />
-        </div>
+        </Step>
 
-        <button type="button" onClick={submit} className="btn btn-primary w-full !py-3.5 text-base">
-          Añadir al carrito · {eur(price)}
-        </button>
-        {done && <p className="text-center text-sm font-bold">¡Añadida al carrito! 🤍 Puedes crear otra si quieres.</p>}
-        <p className="text-xs text-ink-soft">
-          Skin personalizada {eur(PRICES.customSkin)} · insert personalizado {eur(PRICES.customInsert)} · acabados holográficos +{eur(HOLO_EXTRA)}.
-        </p>
+        <div className="space-y-3">
+          <button type="button" onClick={submit} className="btn btn-primary w-full !py-3.5 text-base">
+            Añadir al carrito · {eur(price)}
+          </button>
+          <p role="status" className="text-center text-sm font-bold">
+            {done ? "Añadida al carrito. Puedes crear otra si quieres." : ""}
+          </p>
+          <p className="text-xs text-ink-soft">
+            Skin personalizada {eur(PRICES.customSkin)} · insert personalizado {eur(PRICES.customInsert)} · acabados holográficos +{eur(HOLO_EXTRA)}.
+          </p>
+        </div>
       </div>
     </div>
   );

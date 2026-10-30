@@ -52,11 +52,11 @@ export function CartDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label="Carrito"
-        className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-cream shadow-pop transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l-2 border-ink bg-cream shadow-pop transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}
       >
-        <div className="flex items-center justify-between border-b border-ink/10 px-5 py-4">
-          <h2 className="font-display text-2xl font-bold">Tu carrito</h2>
-          <button ref={closeBtn} onClick={() => setOpen(false)} className="rounded-full p-3 hover:bg-lavender-soft" aria-label="Cerrar carrito">
+        <div className="flex items-center justify-between border-b-2 border-ink px-5 py-4">
+          <h2 className="font-display text-3xl">Tu carrito</h2>
+          <button ref={closeBtn} onClick={() => setOpen(false)} className="rounded-full p-3 hover:bg-mauve/60" aria-label="Cerrar carrito">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
@@ -65,7 +65,7 @@ export function CartDrawer() {
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-            <p className="font-display text-xl">Tu carrito está vacío 🤍</p>
+            <p className="font-display text-xl">Tu carrito está vacío</p>
             <p className="text-ink-soft">Encuentra el diseño perfecto para tu e-reader.</p>
             <Link href="/tienda" onClick={() => setOpen(false)} className="btn btn-primary">
               Seguir comprando
@@ -75,7 +75,7 @@ export function CartDrawer() {
           <>
             <ul className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
               {items.map((i) => (
-                <li key={i.id} className="flex gap-3 rounded-2xl bg-white/70 p-3">
+                <li key={i.id} className="item-in flex gap-3 rounded-2xl border-2 border-ink bg-paper p-3 shadow-[3px_3px_0_var(--color-mauve)]">
                   <CartThumb item={i} className="w-16 shrink-0 self-start" />
                   <div className="min-w-0 flex-1">
                     <p className="font-bold leading-tight">{i.name}</p>
@@ -88,7 +88,7 @@ export function CartDrawer() {
                       </p>
                     )}
                     <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center rounded-full border border-ink/60">
+                      <div className="flex items-center rounded-full border-2 border-ink">
                         <button className="h-11 w-11 text-lg" aria-label="Quitar uno" onClick={() => setQty(i.id, i.qty - 1)}>
                           −
                         </button>
@@ -97,7 +97,7 @@ export function CartDrawer() {
                           +
                         </button>
                       </div>
-                      <p className="font-bold">{eur(i.unitPrice * i.qty)}</p>
+                      <p className="font-extrabold">{eur(i.unitPrice * i.qty)}</p>
                     </div>
                   </div>
                   <button className="-mr-1 -mt-1 self-start rounded-full p-3 text-ink-soft hover:text-ink" aria-label={`Eliminar ${i.name}`} onClick={() => remove(i.id)}>
@@ -108,10 +108,10 @@ export function CartDrawer() {
                 </li>
               ))}
             </ul>
-            <div className="space-y-3 border-t border-ink/10 px-5 py-4">
+            <div className="space-y-3 border-t-2 border-ink px-5 py-4">
               <div className="flex items-baseline justify-between">
                 <span className="font-semibold">Subtotal</span>
-                <span className="font-display text-2xl font-bold">{eur(subtotal)}</span>
+                <span className="font-display text-3xl">{eur(subtotal)}</span>
               </div>
               <p className="text-xs text-ink-soft">Gastos de envío calculados al finalizar la compra. Esto es una demo: no se realiza ningún cobro.</p>
               <Link href="/checkout" onClick={() => setOpen(false)} className="btn btn-primary w-full">

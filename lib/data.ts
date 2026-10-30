@@ -352,10 +352,17 @@ export const unitPrice = (p: Pick<Product, "price" | "hasFinish">, finish?: Fini
 /* ---------- Reseñas de ejemplo ---------- */
 
 export const reviews = [
-  { name: "Lucía M.", text: "La skin quedó perfecta en mi Paperwhite, el acabado arcoíris es una pasada.", stars: 5 },
-  { name: "Carmen R.", text: "Pedí una personalizada con la portada de mi libro favorito y es preciosa.", stars: 5 },
-  { name: "Paula G.", text: "Los marcapáginas son una monada y se quedan perfectos en el libro.", stars: 5 },
-  { name: "Irene S.", text: "Los inserts son un detallazo, mi Kobo parece otro.", stars: 5 },
+  { name: "Lucía M.", text: "La skin quedó perfecta en mi Paperwhite, el acabado arcoíris es una pasada.", stars: 5, slug: "lazos-coquette-skin" },
+  { name: "Carmen R.", text: "Pedí una personalizada con la portada de mi libro favorito y es preciosa.", stars: 5, slug: "acotar-skin" },
+  { name: "Paula G.", text: "Los marcapáginas son una monada y se quedan perfectos en el libro.", stars: 5, slug: "jude-duarte-marcapaginas" },
+  { name: "Irene S.", text: "Los inserts son un detallazo, mi Kobo parece otro.", stars: 5, slug: "spooky-book-club-insert" },
 ];
 
-export const eur = (n: number) => new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(n);
+/** 6 € si es entero, 6,50 € si no */
+export const eur = (n: number) =>
+  new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(n);

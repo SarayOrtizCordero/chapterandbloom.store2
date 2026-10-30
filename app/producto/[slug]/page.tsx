@@ -22,18 +22,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const related = products.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 4);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-7xl px-4 pb-24 pt-10 sm:px-6">
       <ProductView product={product} />
 
       <section className="mt-16 grid gap-3 md:grid-cols-2">
-        <details className="rounded-2xl bg-white px-6 py-4">
-          <summary className="cursor-pointer font-bold">Envíos y devoluciones</summary>
+        <details className="tile !rounded-2xl px-6 py-4">
+          <summary className="cursor-pointer font-extrabold">Envíos y devoluciones</summary>
           <p className="mt-3 text-sm text-ink-soft">
             Texto de ejemplo para la demo. Aquí irán los plazos de preparación, los costes y zonas de envío y la política de devoluciones de Chapter & Bloom.
           </p>
         </details>
-        <details className="rounded-2xl bg-white px-6 py-4">
-          <summary className="cursor-pointer font-bold">{product.needsDevice ? "Cómo colocar tu skin" : "Cuidados"}</summary>
+        <details className="tile !rounded-2xl px-6 py-4">
+          <summary className="cursor-pointer font-extrabold">{product.needsDevice ? "Cómo colocar tu skin" : "Cuidados"}</summary>
           <p className="mt-3 text-sm text-ink-soft">
             {product.needsDevice
               ? "Limpia la superficie, retira el papel protector poco a poco y alinea con los bordes. Si te equivocas, puedes recolocarla con calma. (Texto de ejemplo)"
@@ -43,11 +43,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       </section>
 
       {related.length > 0 && (
-        <section className="mt-20">
-          <h2 className="font-display text-2xl font-black sm:text-3xl">También te puede gustar</h2>
-          <div className="mt-6 grid grid-cols-2 gap-5 md:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.slug} product={p} />
+        <section className="mt-20 overflow-x-clip">
+          <h2 className="font-display text-3xl sm:text-4xl">También te puede gustar</h2>
+          <div className="mt-8 grid auto-rows-fr grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 lg:gap-x-6">
+            {related.map((p, i) => (
+              <div key={p.slug} className="h-full min-w-0">
+                <ProductCard product={p} tilt={[-1, 0.8, -0.5, 1.2][i % 4]} />
+              </div>
             ))}
           </div>
         </section>

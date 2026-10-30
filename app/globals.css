@@ -1,38 +1,69 @@
 @import "tailwindcss";
 
+/*
+  Paleta: solo cuatro colores y sus mezclas.
+  cream  → el papel (fondo de página y fichas)
+  ink    → texto, logo, botón principal, bloques oscuros
+  mauve  → bloque grande de categorías, sombras de pegatina, líneas
+  aqua   → lo que "se enciende": selección, precio, carrito, banda de reseñas
+*/
 @theme {
-  --color-lavender: #cdc4d7;
-  --color-lavender-soft: #e6e0ec;
-  --color-mint: #b8e8ee;
-  --color-mint-soft: #dcf3f6;
-  --color-ink: #312a44;
-  --color-ink-soft: #5d5473;
-  --color-rose: #d7c5d2;
-  --color-rose-deep: #7a4a6c;
   --color-cream: #faf3f1;
-  --color-teal: #2f8f9d;
+  --color-ink: #312a44;
+  --color-mauve: #d7c5d2;
+  --color-aqua: #b8e8ee;
 
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-dm), system-ui, sans-serif;
+  --color-paper: color-mix(in oklab, #faf3f1 55%, white);
+  --color-ink-soft: color-mix(in oklab, #312a44 76%, #faf3f1);
+  --color-mauve-soft: color-mix(in oklab, #d7c5d2 40%, #faf3f1);
+  --color-aqua-soft: color-mix(in oklab, #b8e8ee 40%, #faf3f1);
 
-  --shadow-soft: 0 10px 30px -12px rgb(49 42 68 / 0.28);
-  --shadow-pop: 0 18px 40px -16px rgb(49 42 68 / 0.4);
+  /* Solo errores de formulario: la tinta no basta para distinguirlos y el aqua no contrasta (4,5:1 sobre crema) */
+  --color-berry: #7a4a6c;
+
+  --font-display: var(--font-caprasimo), "Cooper Black", Georgia, serif;
+  --font-sans: var(--font-figtree), system-ui, sans-serif;
+  --font-hand: var(--font-gaegu), "Comic Sans MS", cursive;
+
+  --shadow-soft: 3px 3px 0 var(--color-mauve);
+  --shadow-pop: 6px 6px 0 var(--color-mauve);
+
+  --ease-stick: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Color de la sombra "pegatina": cada bloque lo ajusta para que se vea */
+:root {
+  --sh: var(--color-mauve);
+}
+[data-tone="mauve"] {
+  --sh: var(--color-ink);
+}
+[data-tone="aqua"] {
+  --sh: var(--color-ink);
 }
 
 html {
   scroll-behavior: smooth;
+  /* Alto de la cabecera fija (72 px + 2 px de borde): al navegar, la página no queda tapada por ella */
+  scroll-padding-top: 74px;
 }
 
 body {
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
+/* Caprasimo solo tiene un peso: sin negrita falsa */
 .font-display {
-  font-variation-settings: "SOFT" 100, "WONK" 1;
-  letter-spacing: -0.01em;
+  font-synthesis: none;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+}
+.font-hand {
+  font-family: var(--font-hand);
 }
 
 .no-scrollbar {
@@ -44,53 +75,341 @@ body {
 
 :focus-visible {
   outline: 3px solid var(--color-ink);
-  outline-offset: 2px;
-  border-radius: 6px;
+  outline-offset: 3px;
+  border-radius: 8px;
 }
-/* El pie es oscuro: el aro en tinta no se vería */
-footer :focus-visible {
-  outline-color: var(--color-mint);
+/* En bloques oscuros el aro en tinta no se vería */
+footer :focus-visible,
+[data-tone="ink"] :focus-visible {
+  outline-color: var(--color-aqua);
 }
 
+/* Estas piezas van en la capa "components" para que las utilidades de Tailwind (hidden, !px-4…) puedan retocarlas */
+@layer components {
+/* ---------- Botones: contorno en tinta + sombra desplazada, como una pegatina ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   border-radius: 999px;
-  padding: 0.85rem 1.6rem;
-  font-weight: 700;
+  border: 2px solid var(--color-ink);
+  padding: 0.75rem 1.5rem;
+  font-weight: 800;
   font-size: 0.95rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  line-height: 1.1;
+  box-shadow: 3px 3px 0 var(--sh);
+  transition: transform 0.16s var(--ease-stick), box-shadow 0.16s ease, background 0.2s ease;
   cursor: pointer;
 }
 .btn:hover {
-  transform: translateY(-2px);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--sh);
+}
+.btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--sh);
 }
 .btn-primary {
   background: var(--color-ink);
   color: var(--color-cream);
-  box-shadow: var(--shadow-soft);
 }
-.btn-primary:hover {
-  box-shadow: var(--shadow-pop);
-}
-.btn-primary:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-}
+.btn-aqua,
 .btn-mint {
-  background: var(--color-mint);
+  background: var(--color-aqua);
   color: var(--color-ink);
 }
 .btn-ghost {
-  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
   color: var(--color-ink);
 }
-.btn-ghost:hover {
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ---------- Piezas ---------- */
+.tile {
+  background: var(--color-paper);
+  border: 2px solid var(--color-ink);
+  border-radius: 20px;
+  box-shadow: 5px 5px 0 var(--sh);
+  transition: transform 0.35s var(--ease-stick), rotate 0.35s var(--ease-stick), box-shadow 0.25s ease;
+}
+/* Cada ficha puede llevar su inclinación en --tilt; al pasar por encima se endereza y se levanta */
+.tile-hover {
+  rotate: var(--tilt, 0deg);
+}
+a:hover > .tile-hover,
+.tile-hover:hover {
+  transform: translateY(-6px);
+  rotate: 0deg;
+  box-shadow: 9px 11px 0 var(--sh);
+}
+
+/* Campos y píldoras de selección */
+.field {
+  border: 2px solid var(--color-ink);
+  background: var(--color-paper);
+  border-radius: 999px;
+  padding: 0.7rem 1.25rem;
+  box-shadow: 3px 3px 0 var(--color-mauve);
+}
+.field::placeholder {
+  color: var(--color-ink-soft);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  background: var(--color-cream);
+  padding: 0.45rem 1rem;
+  font-weight: 800;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  box-shadow: 2px 2px 0 var(--color-mauve);
+  transition: transform 0.15s var(--ease-stick), background 0.2s ease, box-shadow 0.15s ease;
+}
+.chip:hover {
+  background: var(--color-aqua);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--color-mauve);
+}
+.chip.is-on {
   background: var(--color-ink);
   color: var(--color-cream);
+  box-shadow: 3px 3px 0 var(--color-aqua);
+}
+
+/* Subrayado de rotulador que aparece al pasar por encima */
+.marker {
+  background-image: linear-gradient(var(--color-aqua), var(--color-aqua));
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 0% 46%;
+  transition: background-size 0.3s ease;
+}
+.marker:hover,
+.marker:focus-visible,
+.marker[aria-current="page"] {
+  background-size: 100% 46%;
+}
+
+/* Hoja de cuaderno rayada para el fondo de las secciones claras. El recorte (1366 × 745) encaja líneas con líneas al repetirse.
+   --paper-fade es cuánto se tapan las líneas con una capa crema: 0 = tal cual la imagen, 1 = sin líneas. */
+.paper {
+  --paper-fade: 0.5;
+  --veil: linear-gradient(rgb(250 243 241 / var(--paper-fade)), rgb(250 243 241 / var(--paper-fade)));
+  background-color: var(--color-cream);
+  background-image: var(--veil), url("/brand/paper.png");
+  background-size: auto, 1366px 745px;
+  background-repeat: no-repeat, repeat;
+}
+/* En móvil, la versión vertical (1080 × 1901, 56 renglones). Su fondo es blanco: se multiplica con el crema para no desentonar. */
+@media (max-width: 767px) {
+  .paper {
+    background-image: var(--veil), url("/brand/paper-mobile.png");
+    background-size: auto, 1080px 1901px;
+    background-blend-mode: normal, multiply;
+  }
+}
+}
+
+/* Cuadros vichy en malva para las secciones de producto: el toque cute sin competir con las fotos */
+.gingham {
+  background-color: var(--color-cream);
+  background-image:
+    linear-gradient(90deg, color-mix(in oklab, var(--color-mauve) 38%, transparent) 50%, transparent 50%),
+    linear-gradient(color-mix(in oklab, var(--color-mauve) 38%, transparent) 50%, transparent 50%);
+  background-size: 56px 56px;
+}
+
+/* ---------- Cinta que se desplaza ---------- */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 46s linear infinite;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- Hero: la skin se despega y se pega ---------- */
+@property --p {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@keyframes peel {
+  from {
+    --p: 0%;
+  }
+  to {
+    --p: 100%;
+  }
+}
+@keyframes peel-edge {
+  from {
+    --p: 0%;
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  to {
+    --p: 100%;
+    opacity: 0;
+  }
+}
+.peel-top {
+  clip-path: polygon(0 0, calc(var(--p) * 2) 0, 0 calc(var(--p) * 2));
+  animation: peel 0.95s cubic-bezier(0.55, 0.1, 0.35, 1) var(--peel-delay, 0s) both;
+}
+.peel-edge {
+  pointer-events: none;
+  clip-path: polygon(calc(var(--p) * 2 - 16%) 0, calc(var(--p) * 2) 0, 0 calc(var(--p) * 2), 0 calc(var(--p) * 2 - 16%));
+  background: linear-gradient(135deg, rgb(49 42 68 / 0), rgb(49 42 68 / 0.22) 55%, rgb(255 255 255 / 0.95));
+  animation: peel-edge 0.95s cubic-bezier(0.55, 0.1, 0.35, 1) var(--peel-delay, 0s) both;
+}
+
+/* Pegatinas del hero: entrada con rebote y vaivén suave */
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    scale: 1.5;
+    rotate: -18deg;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+@keyframes bob {
+  50% {
+    translate: 0 -7px;
+    rotate: 4deg;
+  }
+}
+.sticker-in {
+  animation: drop-in 0.6s var(--ease-stick) var(--d, 0s) both;
+}
+.sticker-bob {
+  animation: bob 5.5s ease-in-out var(--bd, 0s) infinite;
+  filter: drop-shadow(3px 4px 0 var(--sh));
+}
+.parallax {
+  transform: translate(calc(var(--mx, 0) * var(--k, 0) * 1px), calc(var(--my, 0) * var(--k, 0) * 1px));
+  transition: transform 0.25s ease-out;
+}
+
+/* Contador del carrito: rebota al subir */
+@keyframes pop {
+  0% {
+    scale: 0.4;
+  }
+  60% {
+    scale: 1.3;
+  }
+  100% {
+    scale: 1;
+  }
+}
+.pop {
+  animation: pop 0.4s var(--ease-stick);
+}
+
+/* Entrada de piezas al hacer scroll: se "pegan" con un pequeño rebote */
+.reveal {
+  opacity: 0;
+  scale: 1.1;
+  rotate: -2.5deg;
+  transition: opacity 0.35s ease, scale 0.55s var(--ease-stick), rotate 0.55s var(--ease-stick);
+  transition-delay: var(--d, 0s);
+}
+.reveal.in {
+  opacity: 1;
+  scale: 1;
+  rotate: 0deg;
+}
+
+/* Pasos de "crea tu skin": se encienden uno tras otro */
+.step-dot {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  transition: background 0.4s ease, scale 0.4s var(--ease-stick);
+  transition-delay: var(--d, 0s);
+}
+.lit .step-dot {
+  background: var(--color-aqua);
+  scale: 1.08;
+}
+.step-line {
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 0.5s ease;
+  transition-delay: var(--d, 0s);
+}
+.lit .step-line {
+  transform: scaleY(1);
+}
+.step-text {
+  opacity: 0.55;
+  transition: opacity 0.4s ease;
+  transition-delay: var(--d, 0s);
+}
+.lit .step-text {
+  opacity: 1;
+}
+
+/* Un artículo recién añadido al carrito se "pega" */
+@keyframes item-in {
+  from {
+    opacity: 0;
+    scale: 0.88;
+    rotate: -3deg;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+.item-in {
+  animation: item-in 0.45s var(--ease-stick) both;
+}
+
+/* Menú móvil */
+@keyframes sheet-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.sheet {
+  animation: sheet-in 0.35s ease both;
+}
+@keyframes link-in {
+  from {
+    opacity: 0;
+    translate: -16px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.sheet a {
+  animation: link-in 0.4s ease both;
+  animation-delay: var(--d, 0s);
 }
 
 /* Acabados animados (se activan con la clase .fx-anim del SVG) */
@@ -130,26 +449,88 @@ footer :focus-visible {
   animation: fx-in 0.6s ease both;
 }
 @keyframes fx-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; scale: 0.97; }
+  to { opacity: 1; scale: 1; }
 }
 
-/* Aparición suave al hacer scroll */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-  transition-delay: var(--d, 0s);
+/* Palabras del titular del hero: se pegan una tras otra al cargar */
+@keyframes word-in {
+  from {
+    opacity: 0;
+    scale: 1.18;
+    rotate: -4deg;
+    translate: 0 8px;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+    translate: 0 0;
+  }
 }
-.reveal.in {
-  opacity: 1;
-  transform: none;
+.word-in {
+  display: inline-block;
+  animation: word-in 0.55s var(--ease-stick) calc(var(--i, 0) * 70ms + 120ms) both;
+}
+
+/* Animaciones ligadas al scroll. Solo donde el navegador las soporta; si no, todo se queda quieto y visible. */
+@supports (animation-timeline: scroll()) {
+  /* Elementos que suben (o bajan) un poco mientras se recorre el primer tramo de la página */
+  @keyframes rise {
+    to {
+      translate: 0 var(--to, -40px);
+    }
+  }
+  .scroll-rise {
+    animation: rise linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 640px;
+  }
+
+  /* Garabato bajo los títulos: se dibuja al entrar en pantalla */
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .draw {
+    stroke-dasharray: 1;
+    animation: draw linear both;
+    animation-timeline: view();
+    animation-range: entry 15% entry 100%;
+  }
+
+  /* Nombre gigante del pie: sube hasta su sitio */
+  @keyframes wordmark-rise {
+    from {
+      translate: 0 38%;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+  .wordmark-rise {
+    animation: wordmark-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .btn:hover { transform: none; }
+  .word-in, .scroll-rise, .draw, .wordmark-rise { animation: none !important; }
+  .btn, .tile { transition: none; }
+  .btn:hover, .btn:active { transform: none; }
+  a:hover > .tile-hover, .tile-hover:hover { transform: none; }
   .fx-anim * { animation: none !important; }
-  .reveal { opacity: 1; transform: none; transition: none; }
-  .fx-in { animation: none; }
+  .reveal { opacity: 1; scale: 1; rotate: 0deg; transition: none; }
+  .fx-in, .pop, .item-in, .sheet, .sheet a, .sticker-in, .sticker-bob { animation: none; }
+  .peel-top { animation: none; clip-path: none; }
+  .peel-edge { display: none; }
+  .marquee { animation: none; }
+  .parallax { transform: none; transition: none; }
+  .step-dot, .step-line, .step-text { transition: none; }
 }

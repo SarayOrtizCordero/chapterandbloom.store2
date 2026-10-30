@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
-import { DM_Sans, Fraunces } from "next/font/google";
+import { Caprasimo, Figtree, Gaegu } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  axes: ["SOFT", "WONK"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
-const dm = DM_Sans({ subsets: ["latin"], variable: "--font-dm", display: "swap" });
+const caprasimo = Caprasimo({ subsets: ["latin"], weight: "400", variable: "--font-caprasimo", display: "swap" });
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree", display: "swap" });
+const gaegu = Gaegu({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-gaegu", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Chapter & Bloom · Skins e inserts para e-readers",
@@ -22,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${fraunces.variable} ${dm.variable}`}>
+    <html lang="es" data-scroll-behavior="smooth" className={`${caprasimo.variable} ${figtree.variable} ${gaegu.variable}`}>
       <body>
         <CartProvider>
           <Header />

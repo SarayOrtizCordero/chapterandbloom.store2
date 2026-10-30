@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
-/** Aparece suavemente al entrar en pantalla. `delay` en segundos para escalonar. */
+/** La pieza se "pega" al entrar en pantalla. `delay` en segundos para escalonar. */
 export function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(false);
@@ -17,7 +17,7 @@ export function Reveal({ children, delay = 0, className = "" }: { children: Reac
           io.disconnect();
         }
       },
-      { threshold: 0.2 },
+      { threshold: 0.15 },
     );
     io.observe(el);
     return () => io.disconnect();

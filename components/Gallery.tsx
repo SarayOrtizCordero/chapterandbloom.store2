@@ -37,7 +37,7 @@ export function Gallery({
 
   return (
     <div>
-      <div className={`relative overflow-hidden rounded-3xl bg-white ${portrait ? "aspect-[4/5]" : "aspect-square"}`}>
+      <div className={`relative overflow-hidden rounded-[24px] border-2 border-ink bg-paper shadow-[6px_6px_0_var(--color-mauve)] ${portrait ? "aspect-[4/5]" : "aspect-square"}`}>
         {/* Todas las imágenes están montadas: al cambiar solo se alterna la visibilidad (sin esperas) */}
         {images.map((img, k) => (
           <Photo
@@ -67,16 +67,16 @@ export function Gallery({
         {showFx && (
           <p
             role="status"
-            className="absolute left-3 top-3 flex items-center gap-2 rounded-full border border-ink/15 bg-white/95 px-3 py-1.5 text-xs font-semibold shadow-soft"
+            className="absolute left-3 top-3 flex items-center gap-2 rounded-full border-2 border-ink bg-cream px-3 py-1.5 text-xs font-extrabold"
           >
-            <span className={`h-2 w-2 rounded-full bg-mint ring-2 ring-ink/20 ${rendering ? "animate-pulse" : ""}`} aria-hidden />
+            <span className={`h-2.5 w-2.5 rounded-full border-2 border-ink bg-aqua ${rendering ? "animate-pulse" : ""}`} aria-hidden />
             {finishById(finish).name} · {rendering ? "generando vista previa…" : "vista previa"}
           </p>
         )}
       </div>
 
       {images.length > 1 && (
-        <ul className="mt-3 flex gap-2.5 overflow-x-auto pb-1">
+        <ul className="mt-3 flex gap-3.5 overflow-x-auto p-2">
           {images.map((img, k) => (
             <li key={img.src} className="shrink-0">
               <button
@@ -84,7 +84,9 @@ export function Gallery({
                 onClick={() => setI(k)}
                 aria-label={`Ver imagen ${k + 1}`}
                 aria-current={k === idx}
-                className={`relative block h-20 w-20 overflow-hidden rounded-xl border-2 bg-white transition ${k === idx ? "border-ink" : "border-transparent opacity-70 hover:opacity-100"}`}
+                className={`relative block h-20 w-20 overflow-hidden rounded-xl border-2 border-ink bg-paper transition duration-300 [transition-timing-function:var(--ease-stick)] ${
+                  k === idx ? "-rotate-3 shadow-[0_0_0_3px_var(--color-aqua),0_0_0_5px_var(--color-ink)]" : "opacity-75 hover:-translate-y-0.5 hover:rotate-2 hover:opacity-100"
+                }`}
               >
                 <Photo src={img.src} size={640} alt="" fill sizes="80px" className="object-cover" />
               </button>
