@@ -84,18 +84,14 @@ export function ProductView({ product }: { product: Product }) {
   };
 
   return (
-    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[1.05fr_1fr] lg:gap-14">
       {/* En móvil, volver va arriba del todo */}
       <Link href={`/tienda?cat=${product.category}`} className="marker self-start px-1 text-sm font-extrabold lg:hidden">
         ← {category?.name}
       </Link>
 
-      {/* En móvil, la vista previa se queda fija bajo la cabecera mientras eliges color, modelo y acabado */}
-      <div
-        className={`sm:mx-auto sm:w-full sm:max-w-[560px] lg:sticky lg:top-28 lg:mx-0 lg:max-w-none lg:self-start ${
-          product.hasFinish ? "max-sm:sticky max-sm:top-[74px] max-sm:z-20 max-sm:-mx-4 max-sm:border-b-2 max-sm:border-ink/10 max-sm:bg-cream max-sm:px-4 max-sm:py-2" : ""
-        }`}
-      >
+      {/* La imagen se queda fija solo en escritorio; en móvil y tablet se va con la página */}
+      <div className="sm:mx-auto sm:w-full sm:max-w-[560px] lg:sticky lg:top-28 lg:mx-0 lg:max-w-none lg:self-start">
         <Gallery key={variantId} images={images} alt={product.name} finish={product.hasFinish ? finish : undefined} portrait={portrait} />
       </div>
 

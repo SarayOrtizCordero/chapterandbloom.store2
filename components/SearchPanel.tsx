@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
-import { categories, eur, kindLabel, productCover, searchProducts } from "@/lib/data";
+import { eur, kindLabel, productCover, searchProducts } from "@/lib/data";
 import { Photo } from "./Photo";
 
 /** Caja de búsqueda que se abre bajo la cabecera: escribes y ves resultados al momento. */
@@ -48,19 +48,8 @@ export const SearchPanel = forwardRef<HTMLDivElement, { onClose: () => void }>(f
           <button className="btn btn-primary !px-4 !py-2.5 !text-sm">Buscar</button>
         </form>
 
-        <div aria-live="polite" className="mt-3">
-          {!q.trim() ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-hand text-xl font-bold leading-none">Mira por aquí:</span>
-              {categories
-                .filter((c) => !c.soon)
-                .map((c) => (
-                  <Link key={c.id} href={`/tienda?cat=${c.id}`} onClick={onClose} className="chip !px-3 !py-1 !text-[13px]">
-                    {c.short}
-                  </Link>
-                ))}
-            </div>
-          ) : results.length === 0 ? (
+        <div aria-live="polite" className={q.trim() ? "mt-3" : ""}>
+          {!q.trim() ? null : results.length === 0 ? (
             <p className="py-3 text-sm text-ink-soft">No hay nada con “{q.trim()}”. Prueba con otra palabra, como el nombre de un libro o “skin”.</p>
           ) : (
             <>

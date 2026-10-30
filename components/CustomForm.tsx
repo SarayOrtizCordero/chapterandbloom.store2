@@ -80,9 +80,9 @@ export function CustomForm() {
 
   return (
     <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[1fr_1.05fr] lg:gap-14">
-      {/* Vista previa: en móvil se queda fija bajo la cabecera, más pequeña, mientras eliges */}
-      <div className="max-sm:sticky max-sm:top-[74px] max-sm:z-20 max-sm:-mx-4 max-sm:border-b-2 max-sm:border-ink/10 max-sm:bg-cream max-sm:px-4 max-sm:py-2 lg:sticky lg:top-28 lg:self-start">
-        <div data-fly-source className="relative mx-auto aspect-[1/1.05] w-[190px] sm:w-full sm:max-w-[460px]">
+      {/* Vista previa: fija solo en escritorio; en móvil y tablet se va con la página */}
+      <div className="lg:sticky lg:top-28 lg:self-start">
+        <div data-fly-source className="relative mx-auto aspect-[1/1.05] w-full max-w-[460px]">
           <div className="absolute inset-x-[7%] bottom-0 top-[2%] rounded-t-[999px] rounded-b-[28px] border-2 border-ink bg-mauve shadow-[6px_6px_0_var(--color-ink)]" />
           <div className="absolute left-1/2 top-[11%] h-[78%] -translate-x-1/2">
             <div key={`${kind}-${files[0]?.url ?? "base"}`} className="item-in h-full">
@@ -95,16 +95,16 @@ export function CustomForm() {
           <Heart className="sticker-bob absolute -left-[3%] top-[48%] w-[16%] -rotate-12" style={{ ["--bd" as string]: "-2s" }} />
           <Flower className="sticker-bob absolute -right-[2%] bottom-[14%] w-[20%]" style={{ ["--bd" as string]: "-3.5s" }} />
         </div>
-        <div className="mt-2 text-center sm:mt-5">
+        <div className="mt-5 text-center">
           {!files[0] ? (
-            <p className="font-hand inline-flex items-start gap-1 text-xl font-bold leading-none sm:text-2xl">
+            <p className="font-hand inline-flex items-start gap-1 text-2xl font-bold leading-none">
               Aquí verás tu diseño
               <HandArrow className="mt-1 h-7 w-9 rotate-[-70deg]" />
             </p>
           ) : (
             <p className="font-hand text-2xl font-bold leading-none">Así va quedando</p>
           )}
-          <p className="mx-auto mt-2 hidden max-w-sm text-sm text-ink-soft sm:block">
+          <p className="mx-auto mt-2 max-w-sm text-sm text-ink-soft">
             Vista orientativa. Revisaremos tu imagen y te escribiremos si necesitamos ajustar algo.
           </p>
         </div>
