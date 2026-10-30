@@ -4,7 +4,7 @@ import { CategoryArt } from "@/components/CategoryArt";
 import { NotifyForm } from "@/components/NotifyForm";
 import { ProductCard } from "@/components/ProductCard";
 import { Reveal } from "@/components/Reveal";
-import { categories, categoryById, products } from "@/lib/data";
+import { categories, categoryById, products, searchProducts } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Tienda · Chapter & Bloom" };
 
@@ -13,11 +13,8 @@ const tilts = [-1, 0.8, -0.5, 1.2];
 export default async function Shop({ searchParams }: { searchParams: Promise<{ cat?: string; q?: string; buscar?: string }> }) {
   const { cat, q, buscar } = await searchParams;
   const category = cat ? categoryById(cat) : undefined;
-  const query = (q ?? "").trim().toLowerCase();
 
-  const list = products.filter(
-    (p) => (!category || p.category === category.id) && (!query || p.name.toLowerCase().includes(query)),
-  );
+  const list = searchProducts(q ?? "", products.filter((p) => !category || p.category === category.id));
 
   const chip = (active: boolean) => `chip ${active ? "is-on" : ""}`;
 

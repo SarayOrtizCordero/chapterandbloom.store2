@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useCart } from "@/lib/cart";
 import { eur, finishById, HOLO_EXTRA, PRICES, type FinishId } from "@/lib/data";
 import { Art } from "./Art";
+import { flyToCart } from "@/lib/fly";
 import { FinishPicker, ModelPicker } from "./Pickers";
 import { Flower, HandArrow, Heart, Sparkle } from "./Stickers";
 
@@ -12,8 +13,8 @@ type Upload = { name: string; url: string };
 /** Cada bloque del formulario es un paso de verdad: se elige en este orden. */
 function Step({ n, children }: { n: number; children: ReactNode }) {
   return (
-    <div className="flex gap-3.5">
-      <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-aqua text-sm font-extrabold">
+    <div className="flex gap-2.5 sm:gap-3.5">
+      <span aria-hidden className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-aqua text-xs font-extrabold sm:h-8 sm:w-8 sm:text-sm">
         {n}
       </span>
       <div className="min-w-0 flex-1">{children}</div>
@@ -33,6 +34,8 @@ export function CustomForm() {
   const [done, setDone] = useState(false);
   const [drag, setDrag] = useState(false);
   const urls = useRef<string[]>([]);
+  const adding = useRef(false);
+  const submitRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => () => urls.current.forEach((u) => URL.revokeObjectURL(u)), []);
 
@@ -57,22 +60,29 @@ export function CustomForm() {
     setModelError(!model);
     setFileError(files.length === 0);
     if (!model || files.length === 0) return;
-    add({
+    if (adding.current) return;
+    adding.current = true;
+    const item = {
       name: kind === "skin" ? "Skin personalizada" : "Insert personalizado",
-      image: { src: files[0].url, kind: "plain" },
+      image: { src: files[0].url, kind: "plain" as const },
       model,
       finish,
       unitPrice: price,
       custom: { files: files.map((f) => f.name), note, kind },
+    };
+    // La vista previa de tu diseño vuela hasta el carrito
+    flyToCart([document.querySelector("[data-fly-source]"), submitRef.current], files[0].url, () => {
+      add(item);
+      setDone(true);
+      adding.current = false;
     });
-    setDone(true);
   };
 
   return (
-    <div className="grid gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
-      {/* Vista previa */}
-      <div className="lg:sticky lg:top-28 lg:self-start">
-        <div className="relative mx-auto aspect-[1/1.05] w-full max-w-[460px]">
+    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+      {/* Vista previa: en móvil se queda fija bajo la cabecera, más pequeña, mientras eliges */}
+      <div className="max-sm:sticky max-sm:top-[74px] max-sm:z-20 max-sm:-mx-4 max-sm:border-b-2 max-sm:border-ink/10 max-sm:bg-cream max-sm:px-4 max-sm:py-2 lg:sticky lg:top-28 lg:self-start">
+        <div data-fly-source className="relative mx-auto aspect-[1/1.05] w-[190px] sm:w-full sm:max-w-[460px]">
           <div className="absolute inset-x-[7%] bottom-0 top-[2%] rounded-t-[999px] rounded-b-[28px] border-2 border-ink bg-mauve shadow-[6px_6px_0_var(--color-ink)]" />
           <div className="absolute left-1/2 top-[11%] h-[78%] -translate-x-1/2">
             <div key={`${kind}-${files[0]?.url ?? "base"}`} className="item-in h-full">
@@ -85,25 +95,25 @@ export function CustomForm() {
           <Heart className="sticker-bob absolute -left-[3%] top-[48%] w-[16%] -rotate-12" style={{ ["--bd" as string]: "-2s" }} />
           <Flower className="sticker-bob absolute -right-[2%] bottom-[14%] w-[20%]" style={{ ["--bd" as string]: "-3.5s" }} />
         </div>
-        <div className="mt-5 text-center">
+        <div className="mt-2 text-center sm:mt-5">
           {!files[0] ? (
-            <p className="font-hand inline-flex items-start gap-1 text-2xl font-bold leading-none">
+            <p className="font-hand inline-flex items-start gap-1 text-xl font-bold leading-none sm:text-2xl">
               Aquí verás tu diseño
               <HandArrow className="mt-1 h-7 w-9 rotate-[-70deg]" />
             </p>
           ) : (
             <p className="font-hand text-2xl font-bold leading-none">Así va quedando</p>
           )}
-          <p className="mx-auto mt-2 max-w-sm text-sm text-ink-soft">
+          <p className="mx-auto mt-2 hidden max-w-sm text-sm text-ink-soft sm:block">
             Vista orientativa. Revisaremos tu imagen y te escribiremos si necesitamos ajustar algo.
           </p>
         </div>
       </div>
 
       {/* Formulario */}
-      <div className="tile space-y-8 p-5 sm:p-8">
+      <div className="tile space-y-7 p-4 sm:space-y-8 sm:p-8">
         <div>
-          <h1 className="font-display text-4xl leading-[1.05] [text-shadow:3px_3px_0_var(--color-mauve)] sm:text-5xl">Crea tu skin personalizada</h1>
+          <h1 className="font-display text-[2rem] leading-[1.08] [text-shadow:3px_3px_0_var(--color-mauve)] min-[400px]:text-4xl sm:text-5xl">Crea tu skin personalizada</h1>
           <p className="mt-4 max-w-prose text-ink-soft">
             Elige tu e-reader y el acabado, y sube tu diseño (hasta 2 imágenes). Cuéntanos en el mensaje cómo lo imaginas y nosotras lo preparamos.
           </p>
@@ -112,7 +122,7 @@ export function CustomForm() {
         <Step n={1}>
           <fieldset>
             <legend className="mb-3 font-extrabold">Qué quieres crear</legend>
-            <div className="grid grid-cols-2 gap-3" role="radiogroup">
+            <div className="grid gap-3 min-[400px]:grid-cols-2" role="radiogroup">
               {(
                 [
                   ["skin", "Skin personalizada", PRICES.customSkin],
@@ -225,7 +235,7 @@ export function CustomForm() {
         </Step>
 
         <div className="space-y-3">
-          <button type="button" onClick={submit} className="btn btn-primary w-full !py-3.5 text-base">
+          <button ref={submitRef} type="button" onClick={submit} className="btn btn-primary w-full !py-3.5 text-base">
             Añadir al carrito · {eur(price)}
           </button>
           <p role="status" className="text-center text-sm font-bold">

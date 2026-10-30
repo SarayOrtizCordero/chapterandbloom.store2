@@ -93,10 +93,16 @@ export function Hero() {
 
   // Precarga las demás para que el cambio de skin sea inmediato
   useEffect(() => {
-    skins.forEach((s) => {
-      const im = new Image();
-      im.src = optimized(s.src, 1100);
-    });
+    const load = () =>
+      skins.forEach((s) => {
+        const im = new Image();
+        im.sizes = "520px";
+        im.srcset = `${optimized(s.src, 640)} 640w, ${optimized(s.src, 1100)} 1100w`;
+        im.src = optimized(s.src, 640);
+      });
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(load, { timeout: 2500 });
+    else setTimeout(load, 1200);
   }, []);
 
   // Las pegatinas siguen un poco al cursor (solo con ratón)
@@ -163,7 +169,7 @@ export function Hero() {
             <div className="absolute left-1/2 top-[12%] w-[54%] -translate-x-1/2 rotate-[-3.5deg]">
               <div
                 className="relative aspect-[0.669] overflow-hidden rounded-[7%/5%] border-[3px] border-cream bg-ink shadow-[8px_9px_0_var(--color-ink)]"
-                style={{ ["--peel-delay" as string]: first ? "0.5s" : "0s" }}
+                style={{ ["--peel-delay" as string]: first ? "0.15s" : "0s" }}
               >
                 {prev === null ? <Bare /> : <Front src={skins[prev].src} alt="" />}
                 <div key={turn} className="peel-top absolute inset-0">
@@ -177,27 +183,27 @@ export function Hero() {
 
             {/* Pegatinas */}
             <div className="scroll-rise parallax absolute -left-[2%] top-[4%] w-[17%]" style={{ ["--k" as string]: 14, ["--to" as string]: "-48px" }}>
-              <div className="sticker-in" style={{ ["--d" as string]: "1.3s" }}>
+              <div className="sticker-in" style={{ ["--d" as string]: "0.45s" }}>
                 <Ribbon className="sticker-bob w-full rotate-[-12deg]" />
               </div>
             </div>
             <div className="scroll-rise parallax absolute -right-[3%] top-[0%] w-[24%]" style={{ ["--k" as string]: -20, ["--to" as string]: "-22px" }}>
-              <div className="sticker-in" style={{ ["--d" as string]: "1.45s" }}>
+              <div className="sticker-in" style={{ ["--d" as string]: "0.52s" }}>
                 <Sparkle className="sticker-bob w-full" style={{ ["--bd" as string]: "-1s" }} />
               </div>
             </div>
             <div className="scroll-rise parallax absolute -left-[4%] top-[50%] w-[18%]" style={{ ["--k" as string]: 24, ["--to" as string]: "-56px" }}>
-              <div className="sticker-in" style={{ ["--d" as string]: "1.6s" }}>
+              <div className="sticker-in" style={{ ["--d" as string]: "0.59s" }}>
                 <Heart className="sticker-bob w-full -rotate-12" style={{ ["--bd" as string]: "-2.5s" }} />
               </div>
             </div>
             <div className="scroll-rise parallax absolute -right-[2%] bottom-[16%] w-[22%]" style={{ ["--k" as string]: -16, ["--to" as string]: "-30px" }}>
-              <div className="sticker-in" style={{ ["--d" as string]: "1.75s" }}>
+              <div className="sticker-in" style={{ ["--d" as string]: "0.66s" }}>
                 <Flower className="sticker-bob w-full" style={{ ["--bd" as string]: "-3.5s" }} />
               </div>
             </div>
             <div className="scroll-rise parallax absolute left-[27%] top-[-3%] w-[9%]" style={{ ["--k" as string]: 30, ["--to" as string]: "-64px" }}>
-              <div className="sticker-in" style={{ ["--d" as string]: "1.9s" }}>
+              <div className="sticker-in" style={{ ["--d" as string]: "0.73s" }}>
                 <Sparkle className="sticker-bob w-full" fill="var(--color-cream)" style={{ ["--bd" as string]: "-4.5s" }} />
               </div>
             </div>

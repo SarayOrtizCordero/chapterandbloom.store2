@@ -366,3 +366,18 @@ export const eur = (n: number) =>
     minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
     maximumFractionDigits: 2,
   }).format(n);
+
+/* ---------- Búsqueda ---------- */
+
+const plain = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+
+/** Busca por nombre, primera frase de la descripción (incluye el libro), tipo y categoría; sin distinguir tildes ni mayúsculas */
+export function searchProducts(q: string, list: Product[] = products): Product[] {
+  const terms = plain(q).split(/\s+/).filter(Boolean);
+  if (!terms.length) return list;
+  return list.filter((p) => {
+    const firstSentence = p.description.split(/(?<=\.)\s/)[0];
+    const hay = plain(`${p.name} ${firstSentence} ${kindLabel[p.kind]} ${categoryById(p.category)?.name ?? ""}`);
+    return terms.every((t) => hay.includes(t));
+  });
+}

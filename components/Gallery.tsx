@@ -37,7 +37,9 @@ export function Gallery({
 
   return (
     <div>
-      <div className={`relative overflow-hidden rounded-[24px] border-2 border-ink bg-paper shadow-[6px_6px_0_var(--color-mauve)] ${portrait ? "aspect-[4/5]" : "aspect-square"}`}>
+      <div data-fly-source className={`relative overflow-hidden rounded-[24px] border-2 border-ink bg-paper shadow-[6px_6px_0_var(--color-mauve)] ${portrait ? "aspect-[4/5]" : "aspect-[16/10] sm:aspect-square"}`}>
+        {/* Escena cuadrada centrada: en móvil el marco es apaisado y se recorta el blanco de arriba y abajo, y el acabado sigue encajando */}
+        <div className={portrait ? "absolute inset-0" : "absolute left-0 top-1/2 aspect-square w-full -translate-y-1/2"}>
         {/* Todas las imágenes están montadas: al cambiar solo se alterna la visibilidad (sin esperas) */}
         {images.map((img, k) => (
           <Photo
@@ -47,7 +49,7 @@ export function Gallery({
             alt={k === idx ? alt : ""}
             fill
             priority={k === 0}
-            sizes="(min-width: 1024px) 560px, 100vw"
+            sizes="(min-width: 1024px) 560px, 80vw"
             aria-hidden={k !== idx}
             className={`object-cover transition-opacity duration-300 ${k === idx ? "opacity-100" : "opacity-0"}`}
           />
@@ -63,6 +65,7 @@ export function Gallery({
             <FinishFx finish={finish} animate />
           </div>
         )}
+        </div>
 
         {showFx && (
           <p
@@ -76,7 +79,7 @@ export function Gallery({
       </div>
 
       {images.length > 1 && (
-        <ul className="mt-3 flex gap-3.5 overflow-x-auto p-2">
+        <ul className="mt-2 flex gap-2.5 overflow-x-auto p-1.5 sm:mt-3 sm:gap-3.5 sm:p-2">
           {images.map((img, k) => (
             <li key={img.src} className="shrink-0">
               <button
@@ -84,7 +87,7 @@ export function Gallery({
                 onClick={() => setI(k)}
                 aria-label={`Ver imagen ${k + 1}`}
                 aria-current={k === idx}
-                className={`relative block h-20 w-20 overflow-hidden rounded-xl border-2 border-ink bg-paper transition duration-300 [transition-timing-function:var(--ease-stick)] ${
+                className={`relative block h-12 w-12 overflow-hidden rounded-xl border-2 border-ink bg-paper transition duration-300 [transition-timing-function:var(--ease-stick)] ${
                   k === idx ? "-rotate-3 shadow-[0_0_0_3px_var(--color-aqua),0_0_0_5px_var(--color-ink)]" : "opacity-75 hover:-translate-y-0.5 hover:rotate-2 hover:opacity-100"
                 }`}
               >

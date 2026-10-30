@@ -5,10 +5,11 @@ import { CartProvider } from "@/lib/cart";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
+import { CartToast } from "@/components/CartToast";
 
 const caprasimo = Caprasimo({ subsets: ["latin"], weight: "400", variable: "--font-caprasimo", display: "swap" });
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree", display: "swap" });
-const gaegu = Gaegu({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-gaegu", display: "swap" });
+const gaegu = Gaegu({ subsets: ["latin"], weight: "700", variable: "--font-gaegu", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Chapter & Bloom · Skins e inserts para e-readers",
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main>{children}</main>
           <Footer />
           <CartDrawer />
+          <CartToast />
         </CartProvider>
       </body>
     </html>

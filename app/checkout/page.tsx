@@ -34,11 +34,69 @@ function Section({ n, title, children }: { n: number; title: string; children: R
   );
 }
 
+const icon = { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true } as const;
+
+/** Formas de pago que se ofrecen. Los iconos son genéricos, dibujados con el estilo de la web. */
+const payments = [
+  {
+    id: "card",
+    label: "Tarjeta",
+    hint: "Visa o Mastercard",
+    info: "Pagarías con tu tarjeta de forma segura. En esta demo no se pide ningún dato.",
+    icon: (
+      <svg {...icon}>
+        <rect x="3" y="5.5" width="18" height="13" rx="2.5" />
+        <path d="M3 10h18M6.5 15h4" />
+      </svg>
+    ),
+  },
+  {
+    id: "paypal",
+    label: "PayPal",
+    hint: "Con tu cuenta",
+    info: "Te llevaríamos a PayPal para confirmar el pago. En esta demo se simula.",
+    icon: (
+      <svg {...icon}>
+        <path d="M7 20l2.2-14h5.1a3.7 3.7 0 010 7.4H10.4" />
+        <path d="M6.2 11.5h4.2" />
+      </svg>
+    ),
+  },
+  {
+    id: "bizum",
+    label: "Bizum",
+    hint: "Con tu móvil",
+    info: "Recibirías la solicitud en la app de tu banco. En esta demo se simula.",
+    icon: (
+      <svg {...icon}>
+        <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
+        <path d="M11 18.5h2M9.8 9.5l1.6 1.6 3-3" />
+      </svg>
+    ),
+  },
+  {
+    id: "apple",
+    label: "Apple Pay",
+    hint: "Pago rápido",
+    info: "Confirmarías con Face ID o Touch ID. En esta demo se simula.",
+    icon: (
+      <svg {...icon}>
+        <path d="M4 7.5A2.5 2.5 0 016.5 5H18a2 2 0 012 2v1.5" />
+        <path d="M4 7.5V17a2.5 2.5 0 002.5 2.5H18a2 2 0 002-2V11a2 2 0 00-2-2H6.5A2.5 2.5 0 014 7.5z" />
+        <circle cx="16" cy="14" r="1.1" fill="currentColor" />
+      </svg>
+    ),
+  },
+];
+
 const Page = ({ children }: { children: ReactNode }) => <div className="paper min-h-[60vh] overflow-x-clip">{children}</div>;
 
 export default function Checkout() {
   const { items, subtotal, clear } = useCart();
   const [order, setOrder] = useState<string | null>(null);
+  const [method, setMethod] = useState(payments[0].id);
+  const [paidWith, setPaidWith] = useState("");
+  const chosen = payments.find((p) => p.id === method) ?? payments[0];
 
   if (order) {
     return (
@@ -51,7 +109,7 @@ export default function Checkout() {
           </div>
           <h1 className="font-display mt-6 text-5xl leading-none [text-shadow:3px_3px_0_var(--color-mauve)]">Gracias por tu pedido</h1>
           <p className="mt-5 text-lg text-ink-soft">
-            Pedido <strong className="text-ink">{order}</strong> registrado. Esto es una demo: no se ha realizado ningún cobro ni se enviará nada.
+            Pedido <strong className="text-ink">{order}</strong> registrado con pago por {paidWith}. Esto es una demo: no se ha realizado ningún cobro ni se enviará nada.
           </p>
           <Link href="/" className="btn btn-primary mt-8">
             Volver al inicio
@@ -85,6 +143,7 @@ export default function Checkout() {
           className="mt-10 grid gap-10 lg:grid-cols-[1fr_420px]"
           onSubmit={(e) => {
             e.preventDefault();
+            setPaidWith(chosen.label);
             setOrder(`CB-${Math.floor(1000 + Math.random() * 9000)}`);
             clear();
           }}
@@ -107,13 +166,35 @@ export default function Checkout() {
               <p className="text-sm text-ink-soft">Solo lo usamos si hay algún problema con la entrega.</p>
             </Section>
             <Section n={3} title="Pago">
-              <div className="rounded-2xl border-2 border-dashed border-ink bg-mauve-soft p-5 text-sm text-ink-soft">
-                Aquí irá el pago real (por ejemplo, tarjeta, PayPal o Bizum). En esta demo basta con pulsar el botón.
-              </div>
+              <fieldset>
+                <legend className="sr-only">Forma de pago</legend>
+                <div className="grid gap-3 min-[440px]:grid-cols-2">
+                  {payments.map((p) => (
+                    <label key={p.id} className="relative block cursor-pointer">
+                      <input type="radio" name="pago" value={p.id} checked={method === p.id} onChange={() => setMethod(p.id)} className="peer sr-only" />
+                      <span className="flex h-full items-center gap-2.5 rounded-2xl border-2 border-ink bg-paper p-2.5 shadow-[3px_3px_0_var(--color-mauve)] transition duration-300 [transition-timing-function:var(--ease-stick)] hover:-translate-y-0.5 peer-checked:-translate-y-1 peer-checked:rotate-[-1deg] peer-checked:bg-aqua peer-checked:shadow-[4px_4px_0_var(--color-ink)] peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-[3px] peer-focus-visible:outline-ink sm:p-3">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-cream">{p.icon}</span>
+                        <span className="min-w-0">
+                          <span className="block font-extrabold leading-tight">{p.label}</span>
+                          <span className="block text-xs leading-tight text-ink-soft">{p.hint}</span>
+                        </span>
+                      </span>
+                      <span aria-hidden className="absolute -right-2 -top-2 hidden h-6 w-6 items-center justify-center rounded-full border-2 border-ink bg-ink text-aqua peer-checked:flex">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12.5l4.5 4.5L19 7.5" />
+                        </svg>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <p aria-live="polite" className="rounded-2xl border-2 border-dashed border-ink bg-mauve-soft p-4 text-sm text-ink-soft">
+                {chosen.info}
+              </p>
             </Section>
           </div>
 
-          <aside className="tile h-fit space-y-5 p-6 lg:sticky lg:top-28">
+          <aside className="tile h-fit space-y-5 p-6">
             <h2 className="font-display text-3xl leading-none">Resumen</h2>
             <ul className="space-y-4">
               {items.map((i) => (
@@ -139,12 +220,16 @@ export default function Checkout() {
                 <span>Envío</span>
                 <span>Se calcula al pagar (demo)</span>
               </div>
+              <div className="flex justify-between text-ink-soft">
+                <span>Pago</span>
+                <span className="font-bold text-ink">{chosen.label}</span>
+              </div>
             </div>
             <div className="flex items-baseline justify-between border-t-2 border-ink/15 pt-4">
               <span className="font-extrabold">Total</span>
               <span className="font-display text-4xl">{eur(subtotal)}</span>
             </div>
-            <button className="btn btn-primary w-full !py-4 text-base">Realizar pedido (demo)</button>
+            <button className="btn btn-primary w-full !py-4 text-base">Pagar con {chosen.label} (demo)</button>
           </aside>
         </form>
       </div>

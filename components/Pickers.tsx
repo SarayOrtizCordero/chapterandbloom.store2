@@ -303,7 +303,7 @@ export function FinishPicker({ value, onChange, image }: { value: FinishId; onCh
         Acabado: <span className="font-normal">{current.name}</span>
         {current.holo && <span className="ml-2 rounded-full border-2 border-ink bg-aqua px-2.5 py-0.5 align-middle text-xs font-extrabold">+{eur(HOLO_EXTRA)}</span>}
       </legend>
-      <div role="radiogroup" aria-label="Acabado" className="grid grid-cols-6 gap-1.5">
+      <div role="radiogroup" aria-label="Acabado" className="grid grid-cols-3 gap-2.5 sm:grid-cols-6 sm:gap-1.5">
         {finishes.map((f) => {
           const active = f.id === value;
           return (
@@ -314,7 +314,7 @@ export function FinishPicker({ value, onChange, image }: { value: FinishId; onCh
               aria-checked={active}
               aria-label={f.holo ? `${f.name}, más ${HOLO_EXTRA} euro` : f.name}
               onClick={() => onChange(f.id)}
-              className={`flex min-w-0 flex-col gap-1 rounded-[10px] text-center text-[11px] font-bold leading-tight transition duration-200 active:scale-95 ${
+              className={`flex min-w-0 flex-col gap-1 rounded-[10px] text-center text-xs font-bold leading-tight sm:text-[11px] transition duration-200 active:scale-95 ${
                 active ? "-translate-y-1 rotate-[-2deg] border-2 border-ink bg-aqua p-[3.5px] pb-1 shadow-[3px_3px_0_var(--color-ink)]" : "border-2 border-ink/40 bg-paper p-1 pb-1.5 hover:-translate-y-0.5 hover:border-ink"
               }`}
             >

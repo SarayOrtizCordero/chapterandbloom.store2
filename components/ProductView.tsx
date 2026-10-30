@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "@/lib/cart";
 import { categoryById, eur, finishById, kindLabel, unitPrice, type FinishId, type Img, type Product } from "@/lib/data";
+import { flyToCart } from "@/lib/fly";
 import { optimized } from "@/lib/img";
 import { Gallery } from "./Gallery";
 import { FinishPicker, ModelPicker } from "./Pickers";
@@ -23,6 +24,7 @@ export function ProductView({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [error, setError] = useState(false);
   const buyRef = useRef<HTMLButtonElement>(null);
+  const adding = useRef(false);
   const [buyVisible, setBuyVisible] = useState(true);
 
   // En móvil, muestra una barra de compra fija mientras el botón principal queda fuera de pantalla
@@ -62,30 +64,47 @@ export function ProductView({ product }: { product: Product }) {
       document.getElementById("model")?.focus();
       return;
     }
+    if (adding.current) return;
+    adding.current = true;
     const cover = fxImage ?? images[0];
-    add({
+    const item = {
       name: product.name,
-      image: product.hasFinish ? cover : { src: cover.src, kind: "plain" },
+      image: product.hasFinish ? cover : { src: cover.src, kind: "plain" as const },
       model: product.needsDevice ? model : undefined,
       finish: product.hasFinish ? finish : undefined,
       variant: variant?.label,
       unitPrice: price,
       qty,
+    };
+    // La foto vuela hasta el carrito y, al llegar, se añade y se abre el panel
+    flyToCart([document.querySelector("[data-fly-source]"), buyRef.current], optimized(cover.src, 640), () => {
+      add(item);
+      adding.current = false;
     });
   };
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
-      <div className="lg:sticky lg:top-28 lg:self-start">
+    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+      {/* En móvil, volver va arriba del todo */}
+      <Link href={`/tienda?cat=${product.category}`} className="marker self-start px-1 text-sm font-extrabold lg:hidden">
+        ← {category?.name}
+      </Link>
+
+      {/* En móvil, la vista previa se queda fija bajo la cabecera mientras eliges color, modelo y acabado */}
+      <div
+        className={`sm:mx-auto sm:w-full sm:max-w-[560px] lg:sticky lg:top-28 lg:mx-0 lg:max-w-none lg:self-start ${
+          product.hasFinish ? "max-sm:sticky max-sm:top-[74px] max-sm:z-20 max-sm:-mx-4 max-sm:border-b-2 max-sm:border-ink/10 max-sm:bg-cream max-sm:px-4 max-sm:py-2" : ""
+        }`}
+      >
         <Gallery key={variantId} images={images} alt={product.name} finish={product.hasFinish ? finish : undefined} portrait={portrait} />
       </div>
 
       <div className="space-y-7">
         <div>
-          <Link href={`/tienda?cat=${product.category}`} className="marker inline-block px-1 text-sm font-extrabold">
+          <Link href={`/tienda?cat=${product.category}`} className="marker hidden px-1 text-sm font-extrabold lg:inline-block">
             ← {category?.name}
           </Link>
-          <p className="mt-5">
+          <p className="lg:mt-5">
             <span className="inline-block rounded-lg border-2 border-ink bg-aqua px-2.5 py-0.5 text-xs font-extrabold">{kindLabel[product.kind]}</span>
           </p>
           <h1 className="font-display mt-3 text-4xl leading-[1.05] [text-shadow:3px_3px_0_var(--color-mauve)] sm:text-5xl">{product.name}</h1>

@@ -29,6 +29,8 @@
   --shadow-pop: 6px 6px 0 var(--color-mauve);
 
   --ease-stick: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Mismo gesto de "pegarse" pero con un rebote muy corto */
+  --ease-soft: cubic-bezier(0.25, 1.15, 0.5, 1);
 }
 
 /* Color de la sombra "pegatina": cada bloque lo ajusta para que se vea */
@@ -269,21 +271,21 @@ a:hover > .tile-hover,
 }
 .peel-top {
   clip-path: polygon(0 0, calc(var(--p) * 2) 0, 0 calc(var(--p) * 2));
-  animation: peel 0.95s cubic-bezier(0.55, 0.1, 0.35, 1) var(--peel-delay, 0s) both;
+  animation: peel 0.75s cubic-bezier(0.45, 0.1, 0.3, 1) var(--peel-delay, 0s) both;
 }
 .peel-edge {
   pointer-events: none;
   clip-path: polygon(calc(var(--p) * 2 - 16%) 0, calc(var(--p) * 2) 0, 0 calc(var(--p) * 2), 0 calc(var(--p) * 2 - 16%));
   background: linear-gradient(135deg, rgb(49 42 68 / 0), rgb(49 42 68 / 0.22) 55%, rgb(255 255 255 / 0.95));
-  animation: peel-edge 0.95s cubic-bezier(0.55, 0.1, 0.35, 1) var(--peel-delay, 0s) both;
+  animation: peel-edge 0.75s cubic-bezier(0.45, 0.1, 0.3, 1) var(--peel-delay, 0s) both;
 }
 
 /* Pegatinas del hero: entrada con rebote y vaivén suave */
 @keyframes drop-in {
   from {
     opacity: 0;
-    scale: 1.5;
-    rotate: -18deg;
+    scale: 1.2;
+    rotate: -8deg;
   }
   to {
     opacity: 1;
@@ -298,7 +300,7 @@ a:hover > .tile-hover,
   }
 }
 .sticker-in {
-  animation: drop-in 0.6s var(--ease-stick) var(--d, 0s) both;
+  animation: drop-in 0.45s var(--ease-soft) var(--d, 0s) both;
 }
 .sticker-bob {
   animation: bob 5.5s ease-in-out var(--bd, 0s) infinite;
@@ -322,15 +324,15 @@ a:hover > .tile-hover,
   }
 }
 .pop {
-  animation: pop 0.4s var(--ease-stick);
+  animation: pop 0.35s var(--ease-soft);
 }
 
 /* Entrada de piezas al hacer scroll: se "pegan" con un pequeño rebote */
 .reveal {
   opacity: 0;
-  scale: 1.1;
-  rotate: -2.5deg;
-  transition: opacity 0.35s ease, scale 0.55s var(--ease-stick), rotate 0.55s var(--ease-stick);
+  scale: 1.03;
+  rotate: -1deg;
+  transition: opacity 0.3s ease, scale 0.45s var(--ease-soft), rotate 0.45s var(--ease-soft);
   transition-delay: var(--d, 0s);
 }
 .reveal.in {
@@ -382,7 +384,7 @@ a:hover > .tile-hover,
   }
 }
 .item-in {
-  animation: item-in 0.45s var(--ease-stick) both;
+  animation: item-in 0.35s var(--ease-soft) both;
 }
 
 /* Menú móvil */
@@ -395,7 +397,7 @@ a:hover > .tile-hover,
   }
 }
 .sheet {
-  animation: sheet-in 0.35s ease both;
+  animation: sheet-in 0.25s ease both;
 }
 @keyframes link-in {
   from {
@@ -408,7 +410,7 @@ a:hover > .tile-hover,
   }
 }
 .sheet a {
-  animation: link-in 0.4s ease both;
+  animation: link-in 0.3s ease both;
   animation-delay: var(--d, 0s);
 }
 
@@ -457,9 +459,9 @@ a:hover > .tile-hover,
 @keyframes word-in {
   from {
     opacity: 0;
-    scale: 1.18;
-    rotate: -4deg;
-    translate: 0 8px;
+    scale: 1.08;
+    rotate: -2deg;
+    translate: 0 6px;
   }
   to {
     opacity: 1;
@@ -470,7 +472,7 @@ a:hover > .tile-hover,
 }
 .word-in {
   display: inline-block;
-  animation: word-in 0.55s var(--ease-stick) calc(var(--i, 0) * 70ms + 120ms) both;
+  animation: word-in 0.4s var(--ease-soft) calc(var(--i, 0) * 45ms + 40ms) both;
 }
 
 /* Animaciones ligadas al scroll. Solo donde el navegador las soporta; si no, todo se queda quieto y visible. */
@@ -516,6 +518,13 @@ a:hover > .tile-hover,
     animation: wordmark-rise linear both;
     animation-timeline: view();
     animation-range: entry 0% entry 100%;
+  }
+}
+
+/* En móvil, sin el vaivén continuo de las pegatinas: es lo que más repinta y no aporta tanto */
+@media (max-width: 767px) {
+  .sticker-bob {
+    animation: none;
   }
 }
 

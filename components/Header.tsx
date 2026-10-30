@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/lib/cart";
+import { SearchPanel } from "./SearchPanel";
 
 const nav = [
   { label: "Inicio", href: "/" },
@@ -25,16 +26,36 @@ export function Header() {
   const { count, setOpen } = useCart();
   const [menu, setMenu] = useState(false);
   const pathname = usePathname();
+  const [search, setSearch] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchBtnRef = useRef<HTMLButtonElement>(null);
+  const anyOpen = menu || search;
 
   useEffect(() => {
-    if (!menu) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenu(false);
+    if (!anyOpen) return;
+    const closeAll = () => {
+      setMenu(false);
+      setSearch(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeAll();
+    // Tocar fuera del menú o del buscador (y fuera de sus botones) los cierra
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Node;
+      const inside = [navRef, toggleRef, searchRef, searchBtnRef].some((r) => r.current?.contains(t));
+      if (!inside) closeAll();
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [menu]);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [anyOpen]);
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-ink bg-cream/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b-2 border-ink bg-cream">
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" aria-label="Chapter & Bloom, inicio" className="shrink-0" onClick={(e) => {
             toTopIfHere(e, "/");
@@ -56,13 +77,31 @@ export function Header() {
           <Link href="/personalizadas" onClick={(e) => toTopIfHere(e, "/personalizadas")} className="btn btn-aqua mr-1 hidden !px-4 !py-2 !text-sm lg:inline-flex">
             Crea la tuya
           </Link>
-          <Link href="/tienda?buscar=1" className="flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-mauve/60" aria-label="Buscar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-              <circle cx="11" cy="11" r="7" />
-              <path d="M20 20l-3.5-3.5" />
-            </svg>
-          </Link>
           <button
+            ref={searchBtnRef}
+            type="button"
+            className="flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-mauve/60"
+            aria-label={search ? "Cerrar buscador" : "Buscar"}
+            aria-expanded={search}
+            aria-controls="buscador"
+            onClick={() => {
+              setSearch((v) => !v);
+              setMenu(false);
+            }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              {search ? (
+                <path d="M6 6l12 12M18 6L6 18" />
+              ) : (
+                <>
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20l-3.5-3.5" />
+                </>
+              )}
+            </svg>
+          </button>
+          <button
+            data-cart-btn
             className="relative flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-mauve/60"
             aria-label={`Abrir carrito, ${count} artículos`}
             onClick={() => setOpen(true)}
@@ -78,11 +117,15 @@ export function Header() {
             )}
           </button>
           <button
+            ref={toggleRef}
             className="flex h-11 w-11 items-center justify-center rounded-full lg:hidden"
             aria-label={menu ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={menu}
             aria-controls="menu-movil"
-            onClick={() => setMenu((v) => !v)}
+            onClick={() => {
+              setMenu((v) => !v);
+              setSearch(false);
+            }}
           >
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               {menu ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
@@ -91,8 +134,12 @@ export function Header() {
         </div>
       </div>
 
+      {(menu || search) && <div aria-hidden className={`absolute inset-x-0 top-full h-screen bg-ink/25 ${search ? "" : "lg:hidden"}`} />}
+
+      {search && <SearchPanel ref={searchRef} onClose={() => setSearch(false)} />}
+
       {menu && (
-        <nav id="menu-movil" className="sheet absolute inset-x-0 top-full border-b-2 border-ink bg-mauve px-4 pb-6 pt-3 lg:hidden" aria-label="Móvil">
+        <nav ref={navRef} id="menu-movil" className="sheet absolute inset-x-0 top-full border-b-2 border-ink bg-cream px-4 pb-4 pt-1 lg:hidden" aria-label="Móvil">
           {nav.map((n, i) => (
             <Link
               key={n.label}
@@ -102,7 +149,7 @@ export function Header() {
                 setMenu(false);
               }}
               style={{ ["--d" as string]: `${0.08 + i * 0.05}s` }}
-              className="font-display block border-b-2 border-ink/15 py-3 text-3xl"
+              className="font-display block border-b-2 border-ink/10 py-2.5 text-xl"
             >
               {n.label}
             </Link>
@@ -113,7 +160,7 @@ export function Header() {
               toTopIfHere(e, "/personalizadas");
               setMenu(false);
             }}
-            style={{ ["--d" as string]: "0.32s" }} className="btn btn-primary mt-5 w-full !shadow-[3px_3px_0_var(--color-cream)]">
+            style={{ ["--d" as string]: "0.32s" }} className="btn btn-aqua mt-4 w-full !py-2.5 !text-sm">
             Crea la tuya
           </Link>
         </nav>

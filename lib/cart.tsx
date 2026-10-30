@@ -23,7 +23,10 @@ type CartCtx = {
   subtotal: number;
   open: boolean;
   setOpen: (v: boolean) => void;
-  add: (item: Omit<CartItem, "id" | "qty"> & { qty?: number }) => void;
+  /** Por defecto abre el carrito; con { open: false } se añade en silencio y sale un aviso */
+  add: (item: Omit<CartItem, "id" | "qty"> & { qty?: number }, opts?: { open?: boolean }) => void;
+  /** Último artículo añadido (para el aviso). n sube con cada alta */
+  lastAdded: { name: string; n: number; silent: boolean } | null;
   setQty: (id: string, qty: number) => void;
   remove: (id: string) => void;
   clear: () => void;
@@ -36,6 +39,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const [lastAdded, setLastAdded] = useState<CartCtx["lastAdded"]>(null);
 
   useEffect(() => {
     try {
@@ -54,7 +58,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [items, ready]);
 
-  const add = useCallback<CartCtx["add"]>((item) => {
+  const add = useCallback<CartCtx["add"]>((item, opts) => {
     const qty = item.qty ?? 1;
     setItems((prev) => {
       if (!item.custom) {
@@ -65,7 +69,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...item, qty, id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}` }];
     });
-    setOpen(true);
+    setLastAdded((prev) => ({ name: item.name, n: (prev?.n ?? 0) + 1, silent: opts?.open === false }));
+    if (opts?.open !== false) setOpen(true);
   }, []);
 
   const setQty = useCallback((id: string, qty: number) => {
@@ -82,11 +87,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       open,
       setOpen,
       add,
+      lastAdded,
       setQty,
       remove,
       clear,
     }),
-    [items, open, add, setQty, remove, clear],
+    [items, open, add, lastAdded, setQty, remove, clear],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
